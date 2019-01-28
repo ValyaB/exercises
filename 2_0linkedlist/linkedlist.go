@@ -64,3 +64,43 @@ func (f *Feed) DeDup() {
 	}
 
 }
+
+func KtoLast(f *Feed, k int) []string {
+	//k=1 last element
+	arrNode := []string{}
+	for n := f.lastN; n.prev != nil; n = n.prev {
+		if k > 0 {
+			arrNode = append(arrNode, n.Value)
+			k--
+		}
+	}
+	return arrNode
+}
+
+func (f *Feed) CutNode(cutN string) {
+
+	for n := f.firstN; n != nil; n = n.next {
+		if cutN == n.Value {
+			if f.size == 1 {
+				f.size, f.firstN, f.lastN = 0, nil, nil
+				return
+			}
+
+			if n.next != nil {
+				n.next.prev = n.prev
+			} else {
+				n.prev.next = nil
+				f.lastN = n.prev
+			}
+
+			if n.prev != nil {
+				n.prev.next = n.next
+			} else {
+				n.next.prev = nil
+				f.firstN = n.next
+			}
+
+			f.size--
+		}
+	}
+}
