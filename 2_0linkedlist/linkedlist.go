@@ -2,6 +2,7 @@ package linkedlist
 
 import (
 	"fmt"
+	"strconv"
 )
 
 type Feed struct {
@@ -103,4 +104,29 @@ func (f *Feed) CutNode(cutN string) {
 			f.size--
 		}
 	}
+}
+
+func (f *Feed) Partition(p int) *Feed {
+	var head, tail = Feed{}, Feed{}
+	for n := f.firstN; n != nil; n = n.next {
+		i, err := strconv.Atoi(n.Value)
+		if err != nil {
+			fmt.Println("ERROR")
+		}
+		if i < p {
+			head.AddToEnd(n)
+		} else {
+			tail.AddToEnd(n)
+		}
+	}
+
+	// for n := tail.firstN; n != nil; n = n.next {
+	// 	head.AddToEnd(n)
+	// }
+	if tail.size != 0 {
+		tail.firstN.prev = head.firstN
+		head.lastN.next = tail.firstN
+		head.size = head.size + tail.size
+	}
+	return &head
 }
