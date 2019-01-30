@@ -130,3 +130,52 @@ func (f *Feed) Partition(p int) *Feed {
 	}
 	return &head
 }
+
+func SumFeedsInts(f1, f2 *Feed) *Feed {
+	var sumF Feed
+	var val1, val2, carry int
+	for n1, n2 := f1.firstN, f2.firstN; n1 != nil && n2 != nil; {
+		val1, _ = strconv.Atoi(n1.Value)
+		val2, _ = strconv.Atoi(n2.Value)
+		valSum := val1 + val2 + carry
+
+		if valSum < 10 {
+			sumF.AddToEnd(&Node{Value: strconv.Itoa(valSum)})
+			carry = 0
+		} else {
+			sumF.AddToEnd(&Node{Value: strconv.Itoa(valSum % 10)})
+			carry = valSum / 10
+		}
+
+		if f1.size > f2.size && n2.next == nil {
+			n1 = n1.next
+			n2 = &Node{Value: "0"}
+			continue
+		}
+		if f1.size < f2.size && n1.next == nil {
+			n2 = n2.next
+			n1 = &Node{Value: "0"}
+			continue
+		}
+
+		n2 = n2.next
+		n1 = n1.next
+
+	}
+
+	if carry != 0 {
+		if carry < 10 {
+			sumF.AddToEnd(&Node{Value: strconv.Itoa(carry)})
+		} else {
+			sumF.AddToEnd(&Node{Value: strconv.Itoa(carry % 10)})
+			sumF.AddToEnd(&Node{Value: strconv.Itoa(carry / 10)})
+		}
+	}
+	if f1.size == 0 {
+		return f2
+	}
+	if f2.size == 0 {
+		return f1
+	}
+	return &sumF
+}
