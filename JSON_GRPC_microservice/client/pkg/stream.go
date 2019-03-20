@@ -1,4 +1,4 @@
-package jsonstream
+package stream
 
 import (
 	"encoding/json"
@@ -8,41 +8,31 @@ import (
 
 type Port struct {
 	Key     string
-	Message *Message
-}
-type Message struct {
-	Name        string        `json:"name"`
-	City        string        `json:"city"`
-	Country     string        `json:"country"`
-	Alias       []interface{} `json:"alias"`
-	Regions     []interface{} `json:"regions"`
-	Coordinates []float64     `json:"coordinates"`
-	Province    string        `json:"province"`
-	Timezone    string        `json:"timezone"`
-	Unlocs      []string      `json:"unlocs"`
-	Code        string        `json:"code"`
+	Message interface{}
 }
 
-func StreamJSON(file io.Reader, chanPorts chan Port) {
+func StreamJSON(file io.Reader, chanPort chan Port) {
 
-	defer close(chanPorts)
+	defer close(chanPort)
 
 	stream := json.NewDecoder(file)
 	// read open bracket
 	t, err := stream.Token()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	log.Printf("INFO: %T: %v\n", t, t)
 
 	for stream.More() {
-		var message Message
+
 		var skey string
+		var message interface{}
 
 		key, err := stream.Token()
 
 		if err != nil {
-			log.Panicln(err)
+			log.Println(err)
 			continue
 		}
 
@@ -57,6 +47,7 @@ func StreamJSON(file io.Reader, chanPorts chan Port) {
 		if err := stream.Decode(&message); err == io.EOF {
 			break
 		} else if err != nil {
+
 			log.Println(err)
 			continue
 		}
@@ -65,14 +56,13 @@ func StreamJSON(file io.Reader, chanPorts chan Port) {
 			log.Println("INFO: drop Port with empty key string", skey)
 			continue
 		}
-
-		chanPorts <- Port{skey, &message}
-
+		chanPort <- Port{skey, &message}
 	}
 	// read closing bracket
 	t, err = stream.Token()
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 	log.Printf("INFO: %T: %v\n", t, t)
 

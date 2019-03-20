@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package v1;
+//import "github.com/golang/protobuf/ptypes/struct/struct.proto";
+
+
+// The greeting service definition.
+service PortDomain {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckReprly);
+  rpc GetPort (GetPortRequest) returns (GetPortReply) {}
+  rpc AddUpdatePort (AddUpdatePortRequest) returns (AddUpdatePortReply) {}
+}
+
+message HealthCheckRequest {
+}
+
+message HealthCheckReprly {
+  enum ServingStatus {
+    UNKNOWN = 0;
+    SERVING = 1;
+    NOT_SERVING = 2;
+  }
+  ServingStatus status = 1;
+}
+
+// The request message containing the user's name.
+message GetPortRequest {
+  string portkey = 1;
+}
+
+// The response message containing the greetings
+message GetPortReply {
+  string message = 1;
+}
+
+message AddUpdatePortRequest {
+  string key = 1;
+  bytes data =3;
+}
+
+// The response message containing the greetings
+message AddUpdatePortReply {
+  bool message = 1;
+}
